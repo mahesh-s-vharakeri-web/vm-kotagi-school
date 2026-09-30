@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | V.M. Kotagi School</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a3a5c 0%, #c0392b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .login-header { text-align: center; margin-bottom: 30px; }
+    .login-logo {
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, #c0392b, #1a3a5c);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 1.8rem; color: #fff;
+    }
+    .login-header h1 { font-size: 1.3rem; color: #1a3a5c; font-weight: 700; }
+    .login-header p { font-size: 0.85rem; color: #666; margin-top: 4px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #333; margin-bottom: 6px; }
+    .input-wrap { position: relative; }
+    .input-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+    .form-group input {
+      width: 100%; padding: 12px 12px 12px 40px;
+      border: 2px solid #e0e0e0; border-radius: 8px;
+      font-size: 0.9rem; font-family: inherit;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus { outline: none; border-color: #c0392b; }
+    .btn-login {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: all 0.3s;
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(192,57,43,0.4); }
+    .error-msg {
+      background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+      padding: 10px 15px; border-radius: 8px; font-size: 0.85rem;
+      margin-bottom: 15px; display: none;
+    }
+    .back-link { text-align: center; margin-top: 20px; }
+    .back-link a { color: #666; font-size: 0.85rem; text-decoration: none; }
+    .back-link a:hover { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo"><i class="fas fa-star-of-david"></i></div>
+      <h1>School Admin Panel</h1>
+      <p>V.M. Kotagi Basava Samskruti School</p>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <div class="input-wrap">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" placeholder="Enter username" required value="admin">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" placeholder="Enter password" required>
+        </div>
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+    <div class="back-link">
+      <a href="/"><i class="fas fa-arrow-left"></i> Back to School Website</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('errorMsg');
+      btn.textContent = 'Logging in...';
+      btn.disabled = true;
+      err.style.display = 'none';
+
+      const data = {
+        username: e.target.username.value,
+        password: e.target.password.value
+      };
+
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.success) {
+          window.location.href = result.redirect;
+        } else {
+          err.textContent = result.message;
+          err.style.display = 'block';
+        }
+      } catch(ex) {
+        err.textContent = 'Server error. Please try again.';
+        err.style.display = 'block';
+      }
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

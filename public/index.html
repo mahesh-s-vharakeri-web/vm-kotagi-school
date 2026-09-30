@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V.M. Kotagi Basava Samskruti School | Hubballi</title>
+  <meta name="description" content="V.M. Kotagi Basava Samskruti School - English Medium School in Hubballi, Karnataka. Admissions open for Nursery to 8th Standard.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════ TOP BAR ═══════════════ -->
+<div class="top-bar">
+  <div class="container top-bar-inner">
+    <div class="top-bar-left">
+      <span><i class="fas fa-map-marker-alt"></i> Murarji Nagar, 2nd Stage, Gokul Road, Hubballi – 580 027</span>
+    </div>
+    <div class="top-bar-right">
+      <a href="tel:9019054826"><i class="fas fa-phone"></i> 9019054826</a>
+      <a href="tel:9449074231"><i class="fas fa-phone"></i> 9449074231</a>
+      <!-- Language Switcher -->
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" onclick="switchLang('kn')">ಕನ್ನಡ</button>
+        <button class="lang-btn" onclick="switchLang('hi')">हिंदी</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container nav-inner">
+    <div class="nav-brand">
+      <div class="school-logo">
+        <div class="logo-circle">
+          <i class="fas fa-star-of-david"></i>
+        </div>
+      </div>
+      <div class="school-name-nav">
+        <span class="school-main">V.M. Kotagi Basava Samskruti School</span>
+        <span class="school-sub-nav">Basava Kendra | Hubballi</span>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" data-i18n="nav_home" onclick="closeMenu()">Home</a></li>
+      <li><a href="#about" data-i18n="nav_about" onclick="closeMenu()">About</a></li>
+      <li><a href="#admissions" data-i18n="nav_admissions" onclick="closeMenu()">Admissions</a></li>
+      <li><a href="#features" data-i18n="nav_academics" onclick="closeMenu()">Academics</a></li>
+      <li><a href="#facilities" data-i18n="nav_facilities" onclick="closeMenu()">Facilities</a></li>
+      <li><a href="#gallery" data-i18n="nav_gallery" onclick="closeMenu()">Gallery</a></li>
+      <li><a href="#news" data-i18n="nav_news" onclick="closeMenu()">News</a></li>
+      <li><a href="#contact" data-i18n="nav_contact" onclick="closeMenu()">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO SECTION ═══════════════ -->
+<section class="hero" id="home">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <i class="fas fa-award"></i> Recognised by Govt. of Karnataka
+    </div>
+    <h1 class="hero-title">
+      <span class="school-name-hero">V.M. Kotagi</span><br>
+      Basava Samskruti School
+    </h1>
+    <p class="hero-tagline" data-i18n="hero_tagline">Shaping Future Leaders with Indian Values</p>
+    <p class="hero-sub" data-i18n="hero_sub">English Medium | NEP Policy | Recognised by Govt. of Karnataka</p>
+    <div class="hero-btns">
+      <a href="#admissions" class="btn btn-primary" data-i18n="hero_cta">Apply for Admission</a>
+      <a href="#about" class="btn btn-outline" data-i18n="hero_cta2">Learn More</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <a href="#about"><i class="fas fa-chevron-down"></i></a>
+  </div>
+</section>
+
+<!-- ═══════════════ ADMISSIONS BANNER ═══════════════ -->
+<section class="admissions-banner" id="admissions">
+  <div class="container">
+    <div class="banner-grid">
+      <div class="banner-main">
+        <div class="banner-open" data-i18n="admissions_open">Admissions Open</div>
+        <div class="banner-year" data-i18n="admissions_year">2025 - 26</div>
+        <div class="banner-classes" data-i18n="admissions_classes">Nursery, LKG, UKG, Std. 1st to 8th</div>
+        <div class="banner-note" data-i18n="admissions_note">(Std. IX & X will start from next year)</div>
+        <div class="banner-phones">
+          <a href="tel:9019054826" class="phone-btn"><i class="fas fa-phone-alt"></i> 9019054826</a>
+          <a href="tel:9449074231" class="phone-btn"><i class="fas fa-phone-alt"></i> 9449074231</a>
+          <a href="tel:9483474842" class="phone-btn"><i class="fas fa-phone-alt"></i> 9483474842</a>
+        </div>
+      </div>
+      <div class="banner-side">
+        <div class="no-donation-badge">
+          <div class="nd-circle">
+            <span data-i18n="no_donation">NO DONATION</span>
+          </div>
+        </div>
+        <div class="smart-board-badge">
+          <i class="fas fa-tv"></i>
+          <span>Smart Board<br>for All Classes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STATS ═══════════════ -->
+<section class="stats-section">
+  <div class="container stats-grid">
+    <div class="stat-item">
+      <div class="stat-number" data-target="10">0</div>
+      <div class="stat-label" data-i18n="stats_years">Years of Excellence</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="500">0</div>
+      <div class="stat-label" data-i18n="stats_students">Happy Students</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="30">0</div>
+      <div class="stat-label" data-i18n="stats_teachers">Qualified Teachers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="20">0</div>
+      <div class="stat-label" data-i18n="stats_activities">Activities & Programs</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ABOUT SECTION ═══════════════ -->
+<section class="section about-section" id="about">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-i18n="about_title">About Our School</h2>
+      <p class="section-sub" data-i18n="about_sub">Excellence in Education Since Foundation</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-image-box">
+        <div class="about-img-placeholder">
+          <i class="fas fa-school"></i>
+          <p>V.M. Kotagi Basava Samskruti School</p>
+          <span>Hubballi, Karnataka</span>
+        </div>
+        <div class="about-badge-box">
+          <div class="about-badge"><i class="fas fa-check-circle"></i> Govt. Recognised</div>
+          <div class="about-badge"><i class="fas fa-check-circle"></i> English Medium</div>
+          <div class="about-badge"><i class="fas fa-check-circle"></i> NEP Policy</div>
+        </div>
+      </div>
+      <div class="about-text">
+        <div class="about-quote">
+          <i class="fas fa-quote-left"></i>
+          II ShriGuru Basavalingaya Namaha II
+        </div>
+        <h3>Basava Kendra's Premier School</h3>
+        <p data-i18n="about_p1">Basava Kendra has established V.M. Kotagi Basava Samskruti School based on Indian culture along with Sharana Sanskriti with prescribed curriculum.</p>
+        <p data-i18n="about_p2">The syllabus has been designed in accordance with NEP policy in English Medium, providing world-class education with Indian values.</p>
+        <div class="about-highlights">
+          <div class="highlight-item"><i class="fas fa-graduation-cap"></i> English Medium Education</div>
+          <div class="highlight-item"><i class="fas fa-book"></i> NEP Policy Curriculum</div>
+          <div class="highlight-item"><i class="fas fa-users"></i> Sharana Sanskriti Values</div>
+          <div class="highlight-item"><i class="fas fa-star"></i> Govt. of Karnataka Recognised</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FEATURES SECTION ═══════════════ -->
+<section class="section features-section" id="features">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-i18n="features_title">Our Features</h2>
+      <p class="section-sub" data-i18n="features_sub">What makes us special</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+        <h4 data-i18n="f1_title">Skilled Teachers</h4>
+        <p data-i18n="f1_desc">Well qualified and trained teachers committed to excellence in education.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-tv"></i></div>
+        <h4 data-i18n="f2_title">Smart Board Classes</h4>
+        <p data-i18n="f2_desc">Smart Board facility available for all classes for interactive learning.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
+        <h4 data-i18n="f3_title">Limited Class Size</h4>
+        <p data-i18n="f3_desc">Limited number of students in each class for individual attention.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-book-open"></i></div>
+        <h4 data-i18n="f4_title">NEP Curriculum</h4>
+        <p data-i18n="f4_desc">Syllabus designed in accordance with NEP policy in English Medium.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-comments"></i></div>
+        <h4 data-i18n="f5_title">Parent Interaction</h4>
+        <p data-i18n="f5_desc">Regular and need-based interaction with parents for student progress.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+        <h4 data-i18n="f6_title">Unique Skills</h4>
+        <p data-i18n="f6_desc">Committed to providing unique educational and life skills to every child.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FACILITIES SECTION ═══════════════ -->
+<section class="section facilities-section" id="facilities">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-i18n="facilities_title">Our Facilities</h2>
+      <p class="section-sub" data-i18n="facilities_sub">World-class infrastructure for quality education</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="facilities-grid">
+      <div class="facility-card">
+        <div class="facility-icon"><i class="fas fa-book-reader"></i></div>
+        <h4 data-i18n="fac1">Well-Equipped Library</h4>
+      </div>
+      <div class="facility-card">
+        <div class="facility-icon"><i class="fas fa-flask"></i></div>
+        <h4 data-i18n="fac2">Science Lab</h4>
+      </div>
+      <div class="facility-card">
+        <div class="facility-icon"><i class="fas fa-desktop"></i></div>
+        <h4 data-i18n="fac3">Computer Lab</h4>
+      </div>
+      <div class="facility-card">
+        <div class="facility-icon"><i class="fas fa-spa"></i></div>
+        <h4 data-i18n="fac4">Yoga Room</h4>
+      </div>
+      <div class="facility-card">
+        <div class="facility-icon"><i class="fas fa-running"></i></div>
+        <h4 data-i18n="fac5">Playground</h4>
+      </div>
+      <div class="facility-card">
+        <div class="facility-icon"><i class="fas fa-chart-line"></i></div>
+        <h4 data-i18n="fac6">Periodical Review</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ GALLERY SECTION ═══════════════ -->
+<section class="section gallery-section" id="gallery">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-i18n="gallery_title">Photo Gallery</h2>
+      <p class="section-sub" data-i18n="gallery_sub">Glimpses of school life</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-placeholder">
+        <i class="fas fa-images"></i>
+        <p>Photos will appear here as the admin uploads them</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ NEWS SECTION ═══════════════ -->
+<section class="section news-section" id="news">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-i18n="news_title">News & Announcements</h2>
+      <p class="section-sub" data-i18n="news_sub">Stay updated with school activities</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="news-grid" id="newsGrid">
+      <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CONTACT SECTION ═══════════════ -->
+<section class="section contact-section" id="contact">
+  <div class="container">
+    <div class="section-header">
+      <h2 data-i18n="contact_title">Contact Us</h2>
+      <p class="section-sub" data-i18n="contact_sub">We would love to hear from you</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="contact-grid">
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <div class="contact-card">
+          <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <h4>Address</h4>
+          <p data-i18n="contact_address">Murarji Nagar, 2nd Stage, Gokul Road, Hubballi – 580 027</p>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+          <h4 data-i18n="contact_phone">Phone Numbers</h4>
+          <p><a href="tel:9019054826">9019054826</a></p>
+          <p><a href="tel:9449074231">9449074231</a></p>
+          <p><a href="tel:9483474842">9483474842</a></p>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon"><i class="fas fa-clock"></i></div>
+          <h4>School Hours</h4>
+          <p>Monday – Saturday</p>
+          <p>8:30 AM – 4:30 PM</p>
+        </div>
+        <!-- Map -->
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3849.2!2d75.135!3d15.362!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDIxJzQzLjIiTiA3NcKwMDgnMDYuMCJF!5e0!3m2!1sen!2sin!4v1234567890"
+            width="100%" height="200" style="border:0;border-radius:10px;"
+            allowfullscreen loading="lazy">
+          </iframe>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="contact-form-box">
+        <h3 data-i18n="contact_form_title">Send Inquiry</h3>
+        <div id="formMessage" class="form-message hidden"></div>
+        <form id="inquiryForm">
+          <div class="form-group">
+            <label data-i18n="form_parent">Parent Name *</label>
+            <input type="text" name="parent_name" required placeholder="Enter parent's name">
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_student">Student Name *</label>
+            <input type="text" name="student_name" required placeholder="Enter student's name">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label data-i18n="form_phone">Phone Number *</label>
+              <input type="tel" name="phone" required placeholder="10-digit number">
+            </div>
+            <div class="form-group">
+              <label data-i18n="form_email">Email (Optional)</label>
+              <input type="email" name="email" placeholder="your@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_class">Class Applying For *</label>
+            <select name="class_applying" required>
+              <option value="">-- Select Class --</option>
+              <option value="Nursery">Nursery</option>
+              <option value="LKG">LKG</option>
+              <option value="UKG">UKG</option>
+              <option value="1st Standard">1st Standard</option>
+              <option value="2nd Standard">2nd Standard</option>
+              <option value="3rd Standard">3rd Standard</option>
+              <option value="4th Standard">4th Standard</option>
+              <option value="5th Standard">5th Standard</option>
+              <option value="6th Standard">6th Standard</option>
+              <option value="7th Standard">7th Standard</option>
+              <option value="8th Standard">8th Standard</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="form_message">Message</label>
+            <textarea name="message" rows="4" placeholder="Any specific questions?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" data-i18n="form_submit">
+            Submit Inquiry
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="container footer-grid">
+      <div class="footer-col">
+        <h4>V.M. Kotagi Basava Samskruti School</h4>
+        <p>English Medium school based on Indian culture and Sharana Sanskriti values.</p>
+        <p class="footer-recog"><i class="fas fa-award"></i> Recognised by Govt. of Karnataka</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home" data-i18n="nav_home">Home</a></li>
+          <li><a href="#about" data-i18n="nav_about">About</a></li>
+          <li><a href="#admissions" data-i18n="nav_admissions">Admissions</a></li>
+          <li><a href="#facilities" data-i18n="nav_facilities">Facilities</a></li>
+          <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p><i class="fas fa-phone"></i> 9019054826</p>
+        <p><i class="fas fa-phone"></i> 9449074231</p>
+        <p><i class="fas fa-phone"></i> 9483474842</p>
+        <p><i class="fas fa-map-marker-alt"></i> Murarji Nagar, Hubballi - 580027</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <p>© 2025 V.M. Kotagi Basava Samskruti School. <span data-i18n="footer_rights">All Rights Reserved</span>.</p>
+      <p><span data-i18n="footer_managed">Managed by Basava Kendra</span></p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ BACK TO TOP ═══════════════ -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<script src="/js/i18n.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

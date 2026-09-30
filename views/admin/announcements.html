@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Announcements | Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Poppins',sans-serif;background:#f0f2f5;display:flex;min-height:100vh;}
+    .sidebar{width:250px;background:linear-gradient(180deg,#1a3a5c 0%,#0d1f33 100%);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+    .sidebar-logo{padding:25px 20px;border-bottom:1px solid rgba(255,255,255,0.1);text-align:center;}
+    .sidebar-logo .logo-icon{width:55px;height:55px;background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.4rem;}
+    .sidebar-logo h3{font-size:0.85rem;font-weight:700;line-height:1.3;}
+    .sidebar-nav{padding:15px 0;flex:1;}
+    .sidebar-nav a{display:flex;align-items:center;gap:12px;padding:12px 20px;color:rgba(255,255,255,0.75);text-decoration:none;font-size:0.87rem;font-weight:500;transition:all 0.3s;border-left:3px solid transparent;}
+    .sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#f39c12;}
+    .sidebar-nav a i{width:18px;text-align:center;}
+    .sidebar-bottom{padding:15px 20px;border-top:1px solid rgba(255,255,255,0.1);}
+    .sidebar-bottom a{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.85rem;transition:color 0.3s;}
+    .sidebar-bottom a:hover{color:#fff;}
+    .main{margin-left:250px;flex:1;display:flex;flex-direction:column;}
+    .topbar{background:#fff;padding:15px 30px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.08);position:sticky;top:0;z-index:99;}
+    .topbar h2{font-size:1.2rem;color:#1a3a5c;font-weight:700;}
+    .btn-logout{background:#c0392b;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.82rem;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all 0.3s;}
+    .btn-logout:hover{background:#a93226;}
+    .content{padding:30px;flex:1;}
+    .card{background:#fff;border-radius:12px;padding:25px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:25px;}
+    .card-title{font-size:1rem;font-weight:700;color:#1a3a5c;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:8px;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;font-size:0.82rem;font-weight:600;color:#444;margin-bottom:6px;}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.88rem;font-family:inherit;transition:border-color 0.3s;}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#c0392b;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+    .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:0.88rem;font-weight:600;font-family:inherit;transition:all 0.3s;}
+    .btn-primary{background:#c0392b;color:#fff;}
+    .btn-primary:hover{background:#a93226;transform:translateY(-1px);}
+    .btn-sm{padding:6px 12px;font-size:0.78rem;}
+    .btn-danger{background:#e74c3c;color:#fff;}
+    .btn-danger:hover{background:#c0392b;}
+    .btn-edit{background:#1a3a5c;color:#fff;}
+    .btn-edit:hover{background:#0d1f33;}
+    .table{width:100%;border-collapse:collapse;}
+    .table th{background:#f8f9fa;padding:12px 15px;text-align:left;font-size:0.82rem;font-weight:700;color:#555;border-bottom:2px solid #e0e0e0;}
+    .table td{padding:12px 15px;border-bottom:1px solid #f0f0f0;font-size:0.85rem;color:#444;vertical-align:top;}
+    .table tr:hover td{background:#fafafa;}
+    .badge-active{background:#d4edda;color:#155724;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;}
+    .badge-inactive{background:#f8d7da;color:#721c24;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;}
+    .alert{padding:12px 18px;border-radius:8px;margin-bottom:15px;font-size:0.85rem;display:none;}
+    .alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+    .alert-error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><i class="fas fa-star-of-david"></i></div>
+      <h3>V.M. Kotagi School</h3>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/admin/dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="/admin/announcements" class="active"><i class="fas fa-bullhorn"></i> Announcements</a>
+      <a href="/admin/gallery"><i class="fas fa-images"></i> Gallery</a>
+      <a href="/admin/staff"><i class="fas fa-users"></i> Staff</a>
+      <a href="/admin/inquiries"><i class="fas fa-envelope"></i> Inquiries</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="/" target="_blank"><i class="fas fa-external-link-alt"></i> View Website</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <h2><i class="fas fa-bullhorn"></i> Manage Announcements</h2>
+      <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    <div class="content">
+      <div class="alert alert-success" id="alertBox"></div>
+
+      <!-- Add Form -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-plus-circle"></i> Add New Announcement</div>
+        <form id="addForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Title (English) *</label>
+              <input type="text" name="title_en" required placeholder="Announcement title in English">
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select name="category">
+                <option value="news">News</option>
+                <option value="admissions">Admissions</option>
+                <option value="events">Events</option>
+                <option value="holiday">Holiday</option>
+                <option value="results">Results</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Title (Kannada)</label>
+              <input type="text" name="title_kn" placeholder="ಕನ್ನಡದಲ್ಲಿ ಶೀರ್ಷಿಕೆ">
+            </div>
+            <div class="form-group">
+              <label>Title (Hindi)</label>
+              <input type="text" name="title_hi" placeholder="हिंदी में शीर्षक">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Content (English) *</label>
+            <textarea name="content_en" rows="3" required placeholder="Full announcement content in English..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Content (Kannada)</label>
+              <textarea name="content_kn" rows="3" placeholder="ಕನ್ನಡ ವಿಷಯ..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Content (Hindi)</label>
+              <textarea name="content_hi" rows="3" placeholder="हिंदी सामग्री..."></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Announcement</button>
+        </form>
+      </div>
+
+      <!-- List -->
+      <div class="card">
+        <div class="card-title"><i class="fas fa-list"></i> All Announcements</div>
+        <div style="overflow-x:auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Title (EN)</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="annTable"><tr><td colspan="5" style="text-align:center;color:#999;">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadAnnouncements() {
+      const res = await fetch('/admin/api/announcements');
+      const data = await res.json();
+      const tbody = document.getElementById('annTable');
+      if (!data.data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;">No announcements yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.data.map(a => `
+        <tr>
+          <td><strong>${esc(a.title_en)}</strong></td>
+          <td>${esc(a.category)}</td>
+          <td><span class="${a.is_active ? 'badge-active' : 'badge-inactive'}">${a.is_active ? 'Active' : 'Hidden'}</span></td>
+          <td>${new Date(a.created_at).toLocaleDateString('en-IN')}</td>
+          <td style="display:flex;gap:8px;">
+            <button class="btn btn-sm btn-edit" onclick="toggleStatus(${a.id}, ${a.is_active})">
+              <i class="fas fa-${a.is_active ? 'eye-slash' : 'eye'}"></i> ${a.is_active ? 'Hide' : 'Show'}
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAnn(${a.id})"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('addForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const data = Object.fromEntries(fd.entries());
+      const res = await fetch('/admin/api/announcements', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      showAlert(result.message, result.success);
+      if (result.success) { e.target.reset(); loadAnnouncements(); }
+    });
+
+    async function toggleStatus(id, current) {
+      await fetch(`/admin/api/announcements/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ is_active: current ? 0 : 1, title_en: '', content_en: '', category: 'news' })
+      });
+      loadAnnouncements();
+    }
+
+    async function deleteAnn(id) {
+      if (!confirm('Delete this announcement?')) return;
+      const res = await fetch(`/admin/api/announcements/${id}`, { method: 'DELETE' });
+      const result = await res.json();
+      showAlert(result.message, result.success);
+      loadAnnouncements();
+    }
+
+    function showAlert(msg, success) {
+      const a = document.getElementById('alertBox');
+      a.className = `alert ${success ? 'alert-success' : 'alert-error'}`;
+      a.textContent = msg;
+      a.style.display = 'block';
+      setTimeout(() => a.style.display = 'none', 4000);
+    }
+
+    function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    async function logout() { await fetch('/auth/logout', {method:'POST'}); window.location.href='/admin/login'; }
+
+    loadAnnouncements();
+  </script>
+</body>
+</html>
