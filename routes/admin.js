@@ -5,195 +5,122 @@ const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const { authenticateAdmin } = require('../middleware/auth');
-const { getDb, all, get, run, saveDb } = require('../database/db');
+const { getAll, getOne, insert, update, remove, count } = require('../database/db');
 
-// Ensure gallery folder exists
+// Gallery folder
 const galleryDir = path.join(__dirname, '../public/images/gallery');
 if (!fs.existsSync(galleryDir)) fs.mkdirSync(galleryDir, { recursive: true });
 
-// Multer storage for gallery uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, galleryDir),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '-'))
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
-// ── Login Page ─────────────────────────────────────────────
-router.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/login.html'));
-});
+// ── Login ───────────────────────────────────────────────────
+router.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../views/admin/login.html')));
 router.get('/', (req, res) => res.redirect('/admin/login'));
 
-// ── All routes below require authentication ─────────────────
+// ── Auth required below ─────────────────────────────────────
 router.use(authenticateAdmin);
 
 // ── Dashboard ───────────────────────────────────────────────
-router.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/dashboard.html'));
-});
+router.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../views/admin/dashboard.html')));
 
-router.get('/api/stats', async (req, res) => {
-  try {
-    const db = await getDb();
-    const announcements = get(db, 'SELECT COUNT(*) as c FROM announcements').c;
-    const inquiries = get(db, 'SELECT COUNT(*) as c FROM inquiries').c;
-    const unread = get(db, 'SELECT COUNT(*) as c FROM inquiries WHERE is_read = 0').c;
-    const gallery = get(db, 'SELECT COUNT(*) as c FROM gallery').c;
-    const staff = get(db, 'SELECT COUNT(*) as c FROM staff').c;
-    res.json({ announcements, inquiries, unread, gallery, staff });
-  } catch (e) { res.status(500).json({ error: 'Server error' }); }
+router.get('/api/stats', (req, res) => {
+  res.json({
+    announcements: count('announcements'),
+    inquiries: count('inquiries'),
+    unread: count('inquiries', i => !i.is_read),
+    gallery: count('gallery'),
+    staff: count('staff')
+  });
 });
 
 // ── Announcements ───────────────────────────────────────────
-router.get('/announcements', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/announcements.html'));
+router.get('/announcements', (req, res) => res.sendFile(path.join(__dirname, '../views/admin/announcements.html')));
+
+router.get('/api/announcements', (req, res) => {
+  res.json({ success: true, data: getAll('announcements') });
 });
 
-router.get('/api/announcements', async (req, res) => {
-  try {
-    const db = await getDb();
-    const data = all(db, 'SELECT * FROM announcements ORDER BY id DESC');
-    res.json({ success: true, data });
-  } catch (e) { res.status(500).json({ success: false }); }
-});
-
-router.post('/api/announcements', async (req, res) => {
+router.post('/api/announcements', (req, res) => {
   const { title_en, title_kn, title_hi, content_en, content_kn, content_hi, category } = req.body;
-  try {
-    const db = await getDb();
-    run(db, `INSERT INTO announcements (title_en, title_kn, title_hi, content_en, content_kn, content_hi, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [title_en, title_kn || '', title_hi || '', content_en, content_kn || '', content_hi || '', category || 'news']);
-    res.json({ success: true, message: 'Announcement added successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+  insert('announcements', { title_en, title_kn: title_kn||'', title_hi: title_hi||'', content_en, content_kn: content_kn||'', content_hi: content_hi||'', category: category||'news', is_active: 1 });
+  res.json({ success: true, message: 'Announcement added successfully!' });
 });
 
-router.put('/api/announcements/:id', async (req, res) => {
-  const { title_en, title_kn, title_hi, content_en, content_kn, content_hi, category, is_active } = req.body;
-  try {
-    const db = await getDb();
-    run(db, `UPDATE announcements SET title_en=?, title_kn=?, title_hi=?, content_en=?, content_kn=?, content_hi=?, category=?, is_active=? WHERE id=?`,
-      [title_en || '', title_kn || '', title_hi || '', content_en || '', content_kn || '', content_hi || '', category || 'news', is_active !== undefined ? is_active : 1, req.params.id]);
-    res.json({ success: true, message: 'Updated successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+router.put('/api/announcements/:id', (req, res) => {
+  update('announcements', req.params.id, req.body);
+  res.json({ success: true, message: 'Updated successfully!' });
 });
 
-router.delete('/api/announcements/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    run(db, 'DELETE FROM announcements WHERE id = ?', [req.params.id]);
-    res.json({ success: true, message: 'Deleted successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+router.delete('/api/announcements/:id', (req, res) => {
+  remove('announcements', req.params.id);
+  res.json({ success: true, message: 'Deleted successfully!' });
 });
 
 // ── Gallery ─────────────────────────────────────────────────
-router.get('/gallery', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/gallery.html'));
-});
+router.get('/gallery', (req, res) => res.sendFile(path.join(__dirname, '../views/admin/gallery.html')));
 
-router.get('/api/gallery', async (req, res) => {
-  try {
-    const db = await getDb();
-    const data = all(db, 'SELECT * FROM gallery ORDER BY id DESC');
-    res.json({ success: true, data });
-  } catch (e) { res.status(500).json({ success: false }); }
-});
+router.get('/api/gallery', (req, res) => res.json({ success: true, data: getAll('gallery') }));
 
-router.post('/api/gallery', upload.single('photo'), async (req, res) => {
+router.post('/api/gallery', upload.single('photo'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
-  try {
-    const db = await getDb();
-    run(db, 'INSERT INTO gallery (title, filename, category) VALUES (?, ?, ?)',
-      [req.body.title || 'School Photo', req.file.filename, req.body.category || 'general']);
-    res.json({ success: true, message: 'Photo uploaded successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+  insert('gallery', { title: req.body.title || 'School Photo', filename: req.file.filename, category: req.body.category || 'general' });
+  res.json({ success: true, message: 'Photo uploaded successfully!' });
 });
 
-router.delete('/api/gallery/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    const item = get(db, 'SELECT filename FROM gallery WHERE id = ?', [req.params.id]);
-    if (item) {
-      const filePath = path.join(galleryDir, item.filename);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    }
-    run(db, 'DELETE FROM gallery WHERE id = ?', [req.params.id]);
-    res.json({ success: true, message: 'Deleted successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+router.delete('/api/gallery/:id', (req, res) => {
+  const item = getOne('gallery', g => g.id === parseInt(req.params.id));
+  if (item) {
+    const fp = path.join(galleryDir, item.filename);
+    if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  }
+  remove('gallery', req.params.id);
+  res.json({ success: true, message: 'Deleted successfully!' });
 });
 
 // ── Staff ───────────────────────────────────────────────────
-router.get('/staff', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/staff.html'));
-});
+router.get('/staff', (req, res) => res.sendFile(path.join(__dirname, '../views/admin/staff.html')));
 
-router.get('/api/staff', async (req, res) => {
-  try {
-    const db = await getDb();
-    const data = all(db, 'SELECT * FROM staff ORDER BY id ASC');
-    res.json({ success: true, data });
-  } catch (e) { res.status(500).json({ success: false }); }
-});
+router.get('/api/staff', (req, res) => res.json({ success: true, data: getAll('staff') }));
 
-router.post('/api/staff', async (req, res) => {
+router.post('/api/staff', (req, res) => {
   const { name, designation, subject, qualification } = req.body;
-  try {
-    const db = await getDb();
-    run(db, 'INSERT INTO staff (name, designation, subject, qualification) VALUES (?, ?, ?, ?)',
-      [name, designation, subject || '', qualification || '']);
-    res.json({ success: true, message: 'Staff member added!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+  insert('staff', { name, designation, subject: subject||'', qualification: qualification||'', is_active: 1 });
+  res.json({ success: true, message: 'Staff member added!' });
 });
 
-router.delete('/api/staff/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    run(db, 'DELETE FROM staff WHERE id = ?', [req.params.id]);
-    res.json({ success: true, message: 'Deleted successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+router.delete('/api/staff/:id', (req, res) => {
+  remove('staff', req.params.id);
+  res.json({ success: true, message: 'Deleted successfully!' });
 });
 
 // ── Inquiries ───────────────────────────────────────────────
-router.get('/inquiries', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/admin/inquiries.html'));
+router.get('/inquiries', (req, res) => res.sendFile(path.join(__dirname, '../views/admin/inquiries.html')));
+
+router.get('/api/inquiries', (req, res) => res.json({ success: true, data: getAll('inquiries') }));
+
+router.put('/api/inquiries/:id/read', (req, res) => {
+  update('inquiries', req.params.id, { is_read: 1 });
+  res.json({ success: true });
 });
 
-router.get('/api/inquiries', async (req, res) => {
-  try {
-    const db = await getDb();
-    const data = all(db, 'SELECT * FROM inquiries ORDER BY id DESC');
-    res.json({ success: true, data });
-  } catch (e) { res.status(500).json({ success: false }); }
-});
-
-router.put('/api/inquiries/:id/read', async (req, res) => {
-  try {
-    const db = await getDb();
-    run(db, 'UPDATE inquiries SET is_read = 1 WHERE id = ?', [req.params.id]);
-    res.json({ success: true });
-  } catch (e) { res.status(500).json({ success: false }); }
-});
-
-router.delete('/api/inquiries/:id', async (req, res) => {
-  try {
-    const db = await getDb();
-    run(db, 'DELETE FROM inquiries WHERE id = ?', [req.params.id]);
-    res.json({ success: true, message: 'Deleted successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+router.delete('/api/inquiries/:id', (req, res) => {
+  remove('inquiries', req.params.id);
+  res.json({ success: true, message: 'Deleted successfully!' });
 });
 
 // ── Change Password ─────────────────────────────────────────
-router.post('/api/change-password', async (req, res) => {
+router.post('/api/change-password', (req, res) => {
   const { current_password, new_password } = req.body;
-  try {
-    const db = await getDb();
-    const admin = get(db, 'SELECT * FROM admins WHERE id = ?', [req.admin.id]);
-    if (!bcrypt.compareSync(current_password, admin.password)) {
-      return res.status(400).json({ success: false, message: 'Current password is incorrect' });
-    }
-    const hashed = bcrypt.hashSync(new_password, 10);
-    run(db, 'UPDATE admins SET password = ? WHERE id = ?', [hashed, req.admin.id]);
-    res.json({ success: true, message: 'Password changed successfully!' });
-  } catch (e) { res.status(500).json({ success: false, message: 'Server error' }); }
+  const admin = getOne('admins', a => a.id === req.admin.id);
+  if (!bcrypt.compareSync(current_password, admin.password)) {
+    return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+  }
+  update('admins', req.admin.id, { password: bcrypt.hashSync(new_password, 10) });
+  res.json({ success: true, message: 'Password changed successfully!' });
 });
 
 module.exports = router;

@@ -1,54 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, all, get, run, saveDb } = require('../database/db');
+const { getAll, getOne, insert } = require('../database/db');
 
 // GET /api/announcements
-router.get('/announcements', async (req, res) => {
-  try {
-    const db = await getDb();
-    const announcements = all(db, 'SELECT * FROM announcements WHERE is_active = 1 ORDER BY id DESC LIMIT 10');
-    res.json({ success: true, data: announcements });
-  } catch (e) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
+router.get('/announcements', (req, res) => {
+  const announcements = getAll('announcements').filter(a => a.is_active === 1).slice(0, 10);
+  res.json({ success: true, data: announcements });
 });
 
 // GET /api/gallery
-router.get('/gallery', async (req, res) => {
-  try {
-    const db = await getDb();
-    const gallery = all(db, 'SELECT * FROM gallery ORDER BY id DESC');
-    res.json({ success: true, data: gallery });
-  } catch (e) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
+router.get('/gallery', (req, res) => {
+  res.json({ success: true, data: getAll('gallery') });
 });
 
 // GET /api/staff
-router.get('/staff', async (req, res) => {
-  try {
-    const db = await getDb();
-    const staff = all(db, 'SELECT * FROM staff WHERE is_active = 1 ORDER BY id ASC');
-    res.json({ success: true, data: staff });
-  } catch (e) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
+router.get('/staff', (req, res) => {
+  const staff = getAll('staff').filter(s => s.is_active === 1).reverse();
+  res.json({ success: true, data: staff });
 });
 
 // POST /api/inquiry
-router.post('/inquiry', async (req, res) => {
+router.post('/inquiry', (req, res) => {
   const { parent_name, student_name, phone, email, class_applying, message } = req.body;
   if (!parent_name || !student_name || !phone || !class_applying) {
     return res.status(400).json({ success: false, message: 'Please fill all required fields.' });
   }
-  try {
-    const db = await getDb();
-    run(db, `INSERT INTO inquiries (parent_name, student_name, phone, email, class_applying, message) VALUES (?, ?, ?, ?, ?, ?)`,
-      [parent_name, student_name, phone, email || '', class_applying, message || '']);
-    res.json({ success: true, message: 'Your inquiry has been submitted! We will contact you soon.' });
-  } catch (e) {
-    res.status(500).json({ success: false, message: 'Server error. Please call us directly.' });
-  }
+  insert('inquiries', { parent_name, student_name, phone, email: email || '', class_applying, message: message || '', is_read: 0 });
+  res.json({ success: true, message: 'Your inquiry has been submitted! We will contact you soon.' });
 });
 
 module.exports = router;

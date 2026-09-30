@@ -1,151 +1,101 @@
-const initSqlJs = require('sql.js');
+/**
+ * Simple in-memory database for Vercel serverless deployment.
+ * Data is pre-seeded on startup. For local dev, data persists
+ * while the server is running.
+ */
 const bcrypt = require('bcryptjs');
-const path = require('path');
-const fs = require('fs');
 
-// On Vercel, use /tmp (writable). Locally, use the database/ folder.
-const DB_PATH = process.env.VERCEL
-  ? '/tmp/school.db'
-  : path.join(__dirname, 'school.db');
-let db = null;
+// ── In-memory data store ──────────────────────────────────
+const store = {
+  admins: [],
+  announcements: [],
+  gallery: [],
+  staff: [],
+  inquiries: [],
+  _nextId: { admins: 1, announcements: 1, gallery: 1, staff: 1, inquiries: 1 }
+};
 
-async function getDb() {
-  if (db) return db;
-  const SQL = await initSqlJs({
-    locateFile: file => `https://sql.js.org/dist/${file}`
+function nextId(table) {
+  return store._nextId[table]++;
+}
+
+// ── Generic helpers ──────────────────────────────────────
+function getDb() { return store; }
+
+function getAll(table) {
+  return [...store[table]].reverse(); // newest first
+}
+
+function getOne(table, predicate) {
+  return store[table].find(predicate) || null;
+}
+
+function insert(table, data) {
+  const row = { id: nextId(table), created_at: new Date().toISOString(), ...data };
+  store[table].push(row);
+  return row;
+}
+
+function update(table, id, data) {
+  const idx = store[table].findIndex(r => r.id === parseInt(id));
+  if (idx !== -1) store[table][idx] = { ...store[table][idx], ...data };
+}
+
+function remove(table, id) {
+  store[table] = store[table].filter(r => r.id !== parseInt(id));
+}
+
+function count(table, predicate) {
+  return predicate ? store[table].filter(predicate).length : store[table].length;
+}
+
+// ── Seed data ────────────────────────────────────────────
+function initializeDatabase() {
+  // Default admin
+  const hashedPassword = bcrypt.hashSync('admin@school123', 10);
+  insert('admins', { username: 'admin', password: hashedPassword, name: 'School Administrator' });
+
+  // Sample announcements
+  insert('announcements', {
+    title_en: 'Admissions Open for 2025-26',
+    title_kn: '2025-26ಕ್ಕೆ ಪ್ರವೇಶ ಪ್ರಾರಂಭ',
+    title_hi: '2025-26 के लिए प्रवेश प्रारंभ',
+    content_en: 'Admissions are now open for Nursery, LKG, UKG and Standards 1 to 8. Contact us immediately. No donation policy.',
+    content_kn: 'ನರ್ಸರಿ, LKG, UKG ಮತ್ತು 1 ರಿಂದ 8 ನೇ ತರಗತಿಗೆ ಪ್ರವೇಶ ಪ್ರಾರಂಭ. ತಕ್ಷಣ ಸಂಪರ್ಕಿಸಿ.',
+    content_hi: 'नर्सरी, LKG, UKG और कक्षा 1 से 8 के लिए प्रवेश खुले हैं। तुरंत संपर्क करें।',
+    category: 'admissions',
+    is_active: 1
   });
 
-  // Load existing DB file or create new one
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    db = new SQL.Database();
-  }
-  return db;
+  insert('announcements', {
+    title_en: 'Smart Board Facility for All Classes',
+    title_kn: 'ಎಲ್ಲಾ ತರಗತಿಗಳಿಗೆ ಸ್ಮಾರ್ಟ್ ಬೋರ್ಡ್ ಸೌಲಭ್ಯ',
+    title_hi: 'सभी कक्षाओं के लिए स्मार्ट बोर्ड सुविधा',
+    content_en: 'Smart Board facility is now available for all classes, making learning more interactive and engaging.',
+    content_kn: 'ಎಲ್ಲಾ ತರಗತಿಗಳಲ್ಲಿ ಸ್ಮಾರ್ಟ್ ಬೋರ್ಡ್ ಸೌಲಭ್ಯ ಲಭ್ಯವಿದೆ.',
+    content_hi: 'सभी कक्षाओं में स्मार्ट बोर्ड सुविधा उपलब्ध है।',
+    category: 'news',
+    is_active: 1
+  });
+
+  insert('announcements', {
+    title_en: 'NEP 2020 Curriculum Implemented',
+    title_kn: 'NEP 2020 ಪಠ್ಯಕ್ರಮ ಜಾರಿ',
+    title_hi: 'NEP 2020 पाठ्यक्रम लागू',
+    content_en: 'Our school has fully implemented the National Education Policy 2020 curriculum in English Medium for all classes.',
+    content_kn: 'ನಮ್ಮ ಶಾಲೆ ಎಲ್ಲಾ ತರಗತಿಗಳಿಗೆ ಆಂಗ್ಲ ಮಾಧ್ಯಮದಲ್ಲಿ NEP 2020 ಪಠ್ಯಕ್ರಮ ಸಂಪೂರ್ಣವಾಗಿ ಜಾರಿಗೊಳಿಸಿದೆ.',
+    content_hi: 'हमारे विद्यालय ने सभी कक्षाओं के लिए अंग्रेजी माध्यम में NEP 2020 पाठ्यक्रम लागू किया है।',
+    category: 'news',
+    is_active: 1
+  });
+
+  // Sample staff
+  insert('staff', { name: 'Mrs. Rekha Patil', designation: 'Principal', subject: 'Administration', qualification: 'M.Ed', is_active: 1 });
+  insert('staff', { name: 'Mr. Suresh Kumar', designation: 'Senior Teacher', subject: 'Mathematics', qualification: 'B.Ed, M.Sc', is_active: 1 });
+  insert('staff', { name: 'Mrs. Anitha Nair', designation: 'Class Teacher', subject: 'English & EVS', qualification: 'B.Ed, BA', is_active: 1 });
+
+  console.log('✅ In-memory database initialized with seed data');
+  return Promise.resolve(store);
 }
 
-function saveDb() {
-  if (!db) return;
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(DB_PATH, buffer);
-}
-
-// Helper: run a statement (INSERT/UPDATE/DELETE/CREATE)
-function run(db, sql, params = []) {
-  db.run(sql, params);
-  saveDb();
-}
-
-// Helper: get one row
-function get(db, sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  if (stmt.step()) {
-    const row = stmt.getAsObject();
-    stmt.free();
-    return row;
-  }
-  stmt.free();
-  return null;
-}
-
-// Helper: get all rows
-function all(db, sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  const rows = [];
-  while (stmt.step()) rows.push(stmt.getAsObject());
-  stmt.free();
-  return rows;
-}
-
-async function initializeDatabase() {
-  const db = await getDb();
-
-  // Create tables
-  db.run(`CREATE TABLE IF NOT EXISTS admins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    name TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS announcements (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title_en TEXT NOT NULL,
-    title_kn TEXT,
-    title_hi TEXT,
-    content_en TEXT NOT NULL,
-    content_kn TEXT,
-    content_hi TEXT,
-    category TEXT DEFAULT 'news',
-    is_active INTEGER DEFAULT 1,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS gallery (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    filename TEXT NOT NULL,
-    category TEXT DEFAULT 'general',
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS staff (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    designation TEXT NOT NULL,
-    subject TEXT,
-    qualification TEXT,
-    photo TEXT,
-    is_active INTEGER DEFAULT 1,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  db.run(`CREATE TABLE IF NOT EXISTS inquiries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    parent_name TEXT NOT NULL,
-    student_name TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    email TEXT,
-    class_applying TEXT NOT NULL,
-    message TEXT,
-    is_read INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`);
-
-  saveDb();
-
-  // Seed default admin
-  const adminExists = get(db, 'SELECT id FROM admins WHERE username = ?', ['admin']);
-  if (!adminExists) {
-    const hashedPassword = bcrypt.hashSync('admin@school123', 10);
-    db.run('INSERT INTO admins (username, password, name) VALUES (?, ?, ?)', ['admin', hashedPassword, 'School Administrator']);
-    saveDb();
-    console.log('✅ Default admin created: username=admin, password=admin@school123');
-  }
-
-  // Seed announcements
-  const annRow = get(db, 'SELECT COUNT(*) as c FROM announcements');
-  if (!annRow || annRow.c === 0) {
-    db.run(`INSERT INTO announcements (title_en, title_kn, title_hi, content_en, content_kn, content_hi, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['Admissions Open for 2025-26', '2025-26ಕ್ಕೆ ಪ್ರವೇಶ ಪ್ರಾರಂಭ', '2025-26 के लिए प्रवेश प्रारंभ',
-       'Admissions are now open for Nursery, LKG, UKG and Standards 1 to 8. Contact us immediately. No donation policy.',
-       'ನರ್ಸರಿ, LKG, UKG ಮತ್ತು 1 ರಿಂದ 8 ನೇ ತರಗತಿಗೆ ಪ್ರವೇಶ ಪ್ರಾರಂಭ.',
-       'नर्सरी, LKG, UKG और कक्षा 1 से 8 के लिए प्रवेश खुले हैं।', 'admissions']);
-    db.run(`INSERT INTO announcements (title_en, title_kn, title_hi, content_en, content_kn, content_hi, category) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['Smart Board for All Classes', 'ಎಲ್ಲಾ ತರಗತಿಗಳಿಗೆ ಸ್ಮಾರ್ಟ್ ಬೋರ್ಡ್', 'सभी कक्षाओं में स्मार्ट बोर्ड',
-       'Smart Board facility is now available for all classes, enhancing the learning experience.',
-       'ಎಲ್ಲಾ ತರಗತಿಗಳಲ್ಲಿ ಸ್ಮಾರ್ಟ್ ಬೋರ್ಡ್ ಸೌಲಭ್ಯ ಲಭ್ಯ.',
-       'सभी कक्षाओं में स्मार्ट बोर्ड सुविधा उपलब्ध है।', 'news']);
-    saveDb();
-  }
-
-  console.log('✅ Database initialized at:', DB_PATH);
-  return db;
-}
-
-module.exports = { getDb, initializeDatabase, run, get, all, saveDb };
+module.exports = { getDb, getAll, getOne, insert, update, remove, count, initializeDatabase };
