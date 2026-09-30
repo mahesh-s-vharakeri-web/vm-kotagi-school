@@ -11,7 +11,9 @@ let db = null;
 
 async function getDb() {
   if (db) return db;
-  const SQL = await initSqlJs();
+  const SQL = await initSqlJs({
+    locateFile: file => `https://sql.js.org/dist/${file}`
+  });
 
   // Load existing DB file or create new one
   if (fs.existsSync(DB_PATH)) {
