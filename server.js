@@ -29,8 +29,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Initialize DB then start server
-initializeDatabase().then(() => {
+// Start server (only if not running on Vercel serverless)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log('');
     console.log('╔════════════════════════════════════════════════════════╗');
@@ -42,7 +42,6 @@ initializeDatabase().then(() => {
     console.log('╚════════════════════════════════════════════════════════╝');
     console.log('');
   });
-}).catch(err => {
-  console.error('Failed to initialize database:', err);
-  process.exit(1);
-});
+}
+
+module.exports = app;

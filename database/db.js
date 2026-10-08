@@ -101,7 +101,10 @@ function initializeDatabase() {
   insert('gallery', { title: 'Annual Cultural Day', filename: 'cultural.jpg', category: 'cultural' });
 
   console.log('✅ In-memory database initialized with seed data');
-  return Promise.resolve(store);
+  return store;
 }
+
+// Automatically initialize on require (fixes Vercel cold starts)
+initializeDatabase();
 
 module.exports = { getDb, getAll, getOne, insert, update, remove, count, initializeDatabase };
