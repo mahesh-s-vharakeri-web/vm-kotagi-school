@@ -94,6 +94,12 @@ function initializeDatabase() {
   insert('staff', { name: 'Mr. Suresh Kumar', designation: 'Senior Teacher', subject: 'Mathematics', qualification: 'B.Ed, M.Sc', is_active: 1 });
   insert('staff', { name: 'Mrs. Anitha Nair', designation: 'Class Teacher', subject: 'English & EVS', qualification: 'B.Ed, BA', is_active: 1 });
 
+  // Sample gallery
+  insert('gallery', { title: 'Modern Classroom', filename: 'classroom.jpg', category: 'classroom' });
+  insert('gallery', { title: 'Sports Activity', filename: 'sports.jpg', category: 'sports' });
+  insert('gallery', { title: 'Smart Board Learning', filename: 'smartboard.jpg', category: 'facility' });
+  insert('gallery', { title: 'Annual Cultural Day', filename: 'cultural.jpg', category: 'cultural' });
+
   console.log('✅ In-memory database initialized with seed data');
   return Promise.resolve(store);
 }
