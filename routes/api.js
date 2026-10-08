@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getAll, getOne, insert } = require('../database/db');
+const { sendInquiryEmail } = require('../services/email');
 
 // GET /api/announcements
 router.get('/announcements', (req, res) => {
@@ -25,8 +26,19 @@ router.post('/inquiry', (req, res) => {
   if (!parent_name || !student_name || !phone || !class_applying) {
     return res.status(400).json({ success: false, message: 'Please fill all required fields.' });
   }
-  insert('inquiries', { parent_name, student_name, phone, email: email || '', class_applying, message: message || '', is_read: 0 });
+
+  // 1️⃣ Save to Admin Panel (in-memory store)
+  const inquiry = insert('inquiries', {
+    parent_name, student_name, phone,
+    email: email || '', class_applying,
+    message: message || '', is_read: 0
+  });
+
+  // 2️⃣ Send email notification to school Gmail (async, won't block response)
+  sendInquiryEmail(inquiry).catch(err => console.error('Email error:', err));
+
   res.json({ success: true, message: 'Your inquiry has been submitted! We will contact you soon.' });
 });
+
 
 module.exports = router;
