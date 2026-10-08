@@ -470,21 +470,22 @@ body {
   align-items: center;
 }
 
-.about-img-placeholder {
-  background: linear-gradient(135deg, #e8f4fd, #fde8e8);
+.about-img-real {
   border-radius: var(--radius);
-  padding: 40px;
-  text-align: center;
-  border: 2px dashed #ccc;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
-.about-img-placeholder i {
-  font-size: 4rem;
-  color: var(--secondary);
+.about-img-real img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  object-position: center top;
   display: block;
-  margin-bottom: 15px;
+  transition: transform 0.4s ease;
 }
-.about-img-placeholder p { font-weight: 600; color: var(--dark); }
-.about-img-placeholder span { font-size: 0.85rem; color: var(--text-light); }
+.about-img-real img:hover {
+  transform: scale(1.03);
+}
 
 .about-badge-box {
   display: flex;
