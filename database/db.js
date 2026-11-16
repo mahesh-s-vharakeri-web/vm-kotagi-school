@@ -21,7 +21,6 @@ async function connectDB() {
     serverSelectionTimeoutMS: 10000,
     socketTimeoutMS:          45000,
     maxPoolSize:              10,
-    bufferCommands:           false,   // fail fast instead of buffering on disconnect
   });
   console.log('✅ Connected to MongoDB Atlas');
 }
