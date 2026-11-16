@@ -1,25 +1,32 @@
 /**
- * MongoDB Database Layer
- * Drop-in replacement for the in-memory store.
- * All routes continue to work without any changes.
+ * MongoDB Database Layer — Vercel Serverless Compatible
+ * Uses mongoose connection state to handle cold starts correctly.
  */
 const mongoose = require('mongoose');
 const bcrypt   = require('bcryptjs');
 const { Admin, Announcement, Gallery, Staff, Inquiry } = require('./models');
 
-// ── Connection ────────────────────────────────────────
-let isConnected = false;
-
+// ── Serverless-safe connection ────────────────────────
+// mongoose.connection.readyState: 0=disconnected 1=connected 2=connecting 3=disconnecting
 async function connectDB() {
-  if (isConnected) return;
+  if (mongoose.connection.readyState >= 1) return; // already connected/connecting
+
   const uri = process.env.MONGODB_URI;
-  if (!uri) throw new Error('MONGODB_URI environment variable is not set!');
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
-  isConnected = true;
+  if (!uri) {
+    console.error('❌ MONGODB_URI is not set in environment variables!');
+    throw new Error('MONGODB_URI environment variable is not set!');
+  }
+
+  await mongoose.connect(uri, {
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS:          45000,
+    maxPoolSize:              10,
+    bufferCommands:           false,   // fail fast instead of buffering on disconnect
+  });
   console.log('✅ Connected to MongoDB Atlas');
 }
 
-// ── Map collection names to Mongoose models ──────────
+// ── Map collection names → Mongoose models ────────────
 const modelMap = {
   admins:        Admin,
   announcements: Announcement,
@@ -34,73 +41,73 @@ function getModel(table) {
   return model;
 }
 
-// ── Generic helpers (async) ───────────────────────────
+// ── Generic async helpers ─────────────────────────────
 
 async function getAll(table) {
-  const Model = getModel(table);
-  const docs = await Model.find({}).sort({ createdAt: -1 }).lean();
+  await connectDB();
+  const docs = await getModel(table).find({}).sort({ createdAt: -1 }).lean();
   return docs.map(normalise);
 }
 
 async function getOne(table, predicate) {
-  // predicate can be a function (legacy) or a plain query object
+  await connectDB();
   if (typeof predicate === 'function') {
     const all = await getAll(table);
     return all.find(predicate) || null;
   }
-  const Model = getModel(table);
-  const doc = await Model.findOne(predicate).lean();
+  const doc = await getModel(table).findOne(predicate).lean();
   return doc ? normalise(doc) : null;
 }
 
 async function insert(table, data) {
-  const Model = getModel(table);
-  const doc = await Model.create(data);
+  await connectDB();
+  const doc = await getModel(table).create(data);
   return normalise(doc.toObject());
 }
 
 async function update(table, id, data) {
-  const Model = getModel(table);
-  await Model.findByIdAndUpdate(id, { $set: data });
+  await connectDB();
+  await getModel(table).findByIdAndUpdate(id, { $set: data });
 }
 
 async function remove(table, id) {
-  const Model = getModel(table);
-  await Model.findByIdAndDelete(id);
+  await connectDB();
+  await getModel(table).findByIdAndDelete(id);
 }
 
 async function count(table, predicate) {
-  const Model = getModel(table);
-  if (!predicate) return Model.countDocuments();
-  // predicate is a function — load all and filter (acceptable for small collections)
+  await connectDB();
+  if (!predicate) return getModel(table).countDocuments();
   const all = await getAll(table);
   return all.filter(predicate).length;
 }
 
-// ── Normalise MongoDB docs to look like old in-memory rows ──
-// Adds `id` (string), `created_at` so existing route/frontend code works
+// ── Normalise MongoDB docs to match old in-memory shape ──
 function normalise(doc) {
   const { _id, __v, createdAt, updatedAt, ...rest } = doc;
   return {
-    id: _id.toString(),
+    id:         _id.toString(),
     created_at: createdAt ? createdAt.toISOString() : new Date().toISOString(),
     ...rest,
   };
 }
 
-// ── Seed on first-ever run ────────────────────────────
+// ── Seed on very first run only ───────────────────────
 async function seedIfEmpty() {
-  // Only seed if the DB is completely empty
   const adminCount = await Admin.countDocuments();
   if (adminCount > 0) {
-    console.log('📦 Database already seeded — skipping seed step');
+    console.log('📦 DB already seeded — skipping');
     return;
   }
 
-  console.log('🌱 Seeding initial data into MongoDB…');
+  console.log('🌱 Seeding initial data…');
 
   const pwd = process.env.ADMIN_DEFAULT_PASSWORD || 'admin@school123';
-  await Admin.create({ username: 'admin', password: bcrypt.hashSync(pwd, 10), name: 'School Administrator' });
+  await Admin.create({
+    username: 'admin',
+    password: bcrypt.hashSync(pwd, 10),
+    name:     'School Administrator'
+  });
 
   await Announcement.insertMany([
     {
@@ -129,26 +136,26 @@ async function seedIfEmpty() {
       content_kn: 'ಆಂಗ್ಲ ಮಾಧ್ಯಮದಲ್ಲಿ NEP 2020 ಪಠ್ಯಕ್ರಮ ಸಂಪೂರ್ಣವಾಗಿ ಜಾರಿಗೊಳಿಸಲಾಗಿದೆ.',
       content_hi: 'अंग्रेजी माध्यम में NEP 2020 पाठ्यक्रम लागू किया गया है।',
       category: 'news', is_active: 1
-    }
+    },
   ]);
 
   await Staff.insertMany([
-    { name: 'Mrs. Rekha Patil',  designation: 'Principal',       subject: 'Administration', qualification: 'M.Ed',      is_active: 1 },
-    { name: 'Mr. Suresh Kumar',  designation: 'Senior Teacher',  subject: 'Mathematics',    qualification: 'B.Ed, M.Sc', is_active: 1 },
-    { name: 'Mrs. Anitha Nair',  designation: 'Class Teacher',   subject: 'English & EVS',  qualification: 'B.Ed, BA',   is_active: 1 },
+    { name: 'Mrs. Rekha Patil', designation: 'Principal',      subject: 'Administration', qualification: 'M.Ed',       is_active: 1 },
+    { name: 'Mr. Suresh Kumar', designation: 'Senior Teacher', subject: 'Mathematics',    qualification: 'B.Ed, M.Sc', is_active: 1 },
+    { name: 'Mrs. Anitha Nair', designation: 'Class Teacher',  subject: 'English & EVS',  qualification: 'B.Ed, BA',   is_active: 1 },
   ]);
 
   await Gallery.insertMany([
-    { title: 'Computer Lab',       filename: 'classroom.jpg',  category: 'facility'  },
-    { title: 'Playground',         filename: 'sports.jpg',     category: 'sports'    },
-    { title: 'School Library',     filename: 'smartboard.jpg', category: 'facility'  },
-    { title: 'Yoga & Meditation',  filename: 'cultural.jpg',   category: 'cultural'  },
+    { title: 'Computer Lab',      filename: 'classroom.jpg',  category: 'facility' },
+    { title: 'Playground',        filename: 'sports.jpg',     category: 'sports'   },
+    { title: 'School Library',    filename: 'smartboard.jpg', category: 'facility' },
+    { title: 'Yoga & Meditation', filename: 'cultural.jpg',   category: 'cultural' },
   ]);
 
-  console.log('✅ Seed data inserted into MongoDB');
+  console.log('✅ Seed complete');
 }
 
-// ── initializeDatabase — called once on startup ───────
+// ── Main init — called once in server.js ──────────────
 async function initializeDatabase() {
   await connectDB();
   await seedIfEmpty();
